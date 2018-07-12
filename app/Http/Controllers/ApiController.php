@@ -12,10 +12,19 @@ class ApiController extends Controller
     public function index()
     {
         //return ['version'=>'1.0'];
-
         $todo = Todo::all();
 
-        return $todo;
+        if ($todo) {
+            $status = 200;
+        } else {
+            $status = 500;
+        }
+
+        return [
+                    'method'=>'GET',
+                    'statue' => $status,
+                    'data' => $todo
+                ];
     }
 
     public function create(Request $request)
@@ -24,25 +33,57 @@ class ApiController extends Controller
 
         $todo->text = $request->text;
 
-        $todo->save();
+        if ($todo->save()) {
+            $status = 200;
+        } else {
+            $status = 500;
+        }
 
         $todo = $this->index();
-        return $todo;
+
+        return [
+                    'status' => $status,
+                    'method' => 'Add',
+                    'data' => $todo['data']
+                ];
     }
 
     public function update(Request $request)
     {
-        return $request;
         $todo = Todo::find($request->id);
         $todo->name = $request->text;
-        $todo->save();
-        return ['method' => 'update'];
+
+        if ($todo->save()) {
+            $status = 200;
+        } else {
+            $status = 500;
+        }
+
+        $todo = $this->index();
+
+        return [
+                    'status' => $status,
+                    'method' => 'Update',
+                    'data' => $todo['data']
+                ];
     }
 
     public function delete(Request $request)
     {
         $todo = Todo::destroy($request->id);
         
-        return ['method' => 'delete'];
+        if ($todo) {
+            $status = 200;
+        } else {
+            $status = 500;
+        }
+
+        $todo = $this->index();
+
+        return [
+                    'status' => $status,
+                    'method' => 'Delete',
+                    'data' => $todo['data']
+                ];
     }
 }
